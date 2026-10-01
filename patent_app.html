@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0F1420">
 <title>Patent imtihoni</title>
 <style>
@@ -13,7 +13,8 @@
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;background:var(--bg);min-height:100%;}
-  body{color:var(--text);min-height:100vh;padding:16px 16px 40px;
+  body{color:var(--text);min-height:100vh;
+    padding:max(34px, calc(env(safe-area-inset-top,0px) + 8px)) 16px calc(env(safe-area-inset-bottom,0px) + 40px);
     font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;}
   .wrap{max-width:500px;margin:0 auto;}
   button{font-family:inherit;cursor:pointer;}
@@ -169,6 +170,10 @@
   .revline{font-size:14px;margin:3px 0;line-height:1.4;}
   .revline.bad{color:var(--bad);} .revline.ok{color:var(--ok);}
   .reviz{font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.45;padding-top:8px;border-top:1px solid var(--line);}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 30px);transform:translateX(-50%);
+    background:rgba(30,40,56,.97);color:var(--text);border:1px solid var(--line);border-radius:12px;
+    padding:11px 18px;font-size:14px;font-weight:600;z-index:2000;box-shadow:0 8px 30px rgba(0,0,0,.5);
+    max-width:82%;text-align:center;animation:fadein .2s ease;}
 </style>
 </head>
 <body>
@@ -7317,7 +7322,7 @@
       listen:"🔊 Tinglash",playing:"▶ Ijro etilyapti…",audioOff:"Ovozni yuklash uchun internet kerak",
       audioLoad:"Ovoz yuklanyapti…",check:"Tekshirish",typeHere:"Javobni yozing…",
       updOk:"Yangilandi ✓",updNo:"Oflayn — ichki baza",updChk:"Tekshirilyapti…",
-      variants:"Variantlar",byTopic:"Mavzu bo'yicha mashq",variant:"Variant",trans:"Tarjima",tutNext:"Keyingisi",tutDone:"Boshlash",dlAudio:"Ovozlarni yuklab olish",dlHint:"oflayn uchun",dlDone:"Oflayn tayyor ✓",dlOff:"Internet kerak",dlWait:"Yuklanyapti…",phoneTitle:"Telefon raqamingiz",phoneHint:"Davom etish uchun raqamingizni kiriting",enter:"Kirish",phoneErr:"Raqamni to'liq kiriting",demo:"Demo imtihon",examInfo:"22 savol · 40 daqiqa",examIntroDesc:"22 ta savol, 40 daqiqa, tarjimasiz. Haqiqiy imtihondek: javob bergach keyingiga o'tadi, natija oxirida chiqadi.",start:"Boshlash →",finishExam:"Yakunlash",examPass:"O'tdingiz ✅",examFail:"O'ta olmadingiz ❌",examPassMsg:"Tabriklaymiz! O'tish balliga yetdingiz.",examFailMsg:"Hali yetmadi — mashq qilib, yana urinib ko'ring.",factNote:"2026-yil holatiga ko'ra, rasmiy imtihondan o'tish uchun kamida 19/22 (≈86%) to'g'ri javob kerak.",answeredBtn:"📋 Javob bergan savollar",yourAns:"Sizning javobingiz",correctAns:"To'g'ri javob",notAnswered:"— javob berilmagan —",examResult:"Natija",rfFlag:"Rossiya bayrog'i",rfGerb:"Rossiya gerbi",otherSym:"boshqa davlat ramzi",copied:"nusxalandi ✅",lockHint:"🔒 Har bir variant oldingisini tugatgach ochiladi",updTitle:"Yangi versiya chiqdi",updMsg:"Davom etish uchun ilovani yangi versiyaga yangilang.",updBtn:"Yangilash"},
+      variants:"Variantlar",byTopic:"Mavzu bo'yicha mashq",variant:"Variant",trans:"Tarjima",tutNext:"Keyingisi",tutDone:"Boshlash",dlAudio:"Ovozlarni yuklab olish",dlHint:"oflayn uchun",dlDone:"Oflayn tayyor ✓",dlOff:"Internet kerak",dlWait:"Yuklanyapti…",phoneTitle:"Telefon raqamingiz",phoneHint:"Davom etish uchun raqamingizni kiriting",enter:"Kirish",phoneErr:"Raqamni to'liq kiriting",demo:"Demo imtihon",examInfo:"22 savol · 40 daqiqa",examIntroDesc:"22 ta savol, 40 daqiqa, tarjimasiz. Haqiqiy imtihondek: javob bergach keyingiga o'tadi, natija oxirida chiqadi.",start:"Boshlash →",finishExam:"Yakunlash",examPass:"O'tdingiz ✅",examFail:"O'ta olmadingiz ❌",examPassMsg:"Tabriklaymiz! O'tish balliga yetdingiz.",examFailMsg:"Hali yetmadi — mashq qilib, yana urinib ko'ring.",factNote:"2026-yil holatiga ko'ra, rasmiy imtihondan o'tish uchun kamida 19/22 (≈86%) to'g'ri javob kerak.",answeredBtn:"📋 Javob bergan savollar",yourAns:"Sizning javobingiz",correctAns:"To'g'ri javob",notAnswered:"— javob berilmagan —",examResult:"Natija",rfFlag:"Rossiya bayrog'i",rfGerb:"Rossiya gerbi",otherSym:"boshqa davlat ramzi",copied:"nusxalandi ✅",lockHint:"🔒 Har bir variant oldingisini tugatgach ochiladi",updTitle:"Yangi versiya chiqdi",updMsg:"Davom etish uchun ilovani yangi versiyaga yangilang.",updBtn:"Yangilash",exitHint:"Chiqish uchun yana bir marta bosing"},
     tg:{appTitle:"Имтиҳони патент",sub:"Ба имтиҳон бо забони модарӣ омода шавед",
       all:"Ҳамаи саволҳо",til:"Забони русӣ",tarix:"Таърих",qonunchilik:"Қонунгузорӣ",mistakes:"Хатоҳои ман",
       q:"Савол",next:"Навбатӣ",wrong:"Хато!",right:"Ҷавоби дуруст:",done:"Тамом шуд!",score:"Ҷавобҳои дуруст",
@@ -7325,7 +7330,7 @@
       listen:"🔊 Гӯш кардан",playing:"▶ Пахш шуда истодааст…",audioOff:"Барои боргирии овоз интернет лозим",
       audioLoad:"Овоз бор мешавад…",check:"Санҷидан",typeHere:"Ҷавобро нависед…",
       updOk:"Нав шуд ✓",updNo:"Оффлайн — пойгоҳи дохилӣ",updChk:"Санҷида мешавад…",
-      variants:"Вариантҳо",byTopic:"Машқ аз рӯи мавзӯъ",variant:"Вариант",trans:"Тарҷума",tutNext:"Навбатӣ",tutDone:"Оғоз",dlAudio:"Боргирии овозҳо",dlHint:"барои офлайн",dlDone:"Барои офлайн тайёр ✓",dlOff:"Интернет лозим",dlWait:"Бор шуда истодааст…",phoneTitle:"Рақами телефони шумо",phoneHint:"Барои идома рақами худро ворид кунед",enter:"Даромадан",phoneErr:"Рақамро пурра ворид кунед",demo:"Имтиҳони озмоишӣ",examInfo:"22 савол · 40 дақиқа",examIntroDesc:"22 савол, 40 дақиқа, бе тарҷума. Мисли имтиҳони воқеӣ: баъди ҷавоб ба навбатӣ мегузарад, натиҷа дар охир.",start:"Оғоз →",finishExam:"Анҷом",examPass:"Гузаштед ✅",examFail:"Нагузаштед ❌",examPassMsg:"Табрик! Ба балли гузариш расидед.",examFailMsg:"Ҳанӯз нарасид — машқ карда, боз кӯшиш кунед.",factNote:"Тибқи ҳолати соли 2026, барои гузаштан аз имтиҳони расмӣ ҳадди ақал 19/22 (≈86%) ҷавоби дуруст лозим аст.",answeredBtn:"📋 Саволҳои ҷавобдодашуда",yourAns:"Ҷавоби шумо",correctAns:"Ҷавоби дуруст",notAnswered:"— ҷавоб дода нашуд —",examResult:"Натиҷа",rfFlag:"Парчами Россия",rfGerb:"Нишони Россия",otherSym:"рамзи давлати дигар",copied:"нусха шуд ✅",lockHint:"🔒 Ҳар вариант баъди анҷоми қаблӣ кушода мешавад",updTitle:"Версияи нав баромад",updMsg:"Барои идома, лутфан барномаро ба версияи нав нав кунед.",updBtn:"Нав кардан"},
+      variants:"Вариантҳо",byTopic:"Машқ аз рӯи мавзӯъ",variant:"Вариант",trans:"Тарҷума",tutNext:"Навбатӣ",tutDone:"Оғоз",dlAudio:"Боргирии овозҳо",dlHint:"барои офлайн",dlDone:"Барои офлайн тайёр ✓",dlOff:"Интернет лозим",dlWait:"Бор шуда истодааст…",phoneTitle:"Рақами телефони шумо",phoneHint:"Барои идома рақами худро ворид кунед",enter:"Даромадан",phoneErr:"Рақамро пурра ворид кунед",demo:"Имтиҳони озмоишӣ",examInfo:"22 савол · 40 дақиқа",examIntroDesc:"22 савол, 40 дақиқа, бе тарҷума. Мисли имтиҳони воқеӣ: баъди ҷавоб ба навбатӣ мегузарад, натиҷа дар охир.",start:"Оғоз →",finishExam:"Анҷом",examPass:"Гузаштед ✅",examFail:"Нагузаштед ❌",examPassMsg:"Табрик! Ба балли гузариш расидед.",examFailMsg:"Ҳанӯз нарасид — машқ карда, боз кӯшиш кунед.",factNote:"Тибқи ҳолати соли 2026, барои гузаштан аз имтиҳони расмӣ ҳадди ақал 19/22 (≈86%) ҷавоби дуруст лозим аст.",answeredBtn:"📋 Саволҳои ҷавобдодашуда",yourAns:"Ҷавоби шумо",correctAns:"Ҷавоби дуруст",notAnswered:"— ҷавоб дода нашуд —",examResult:"Натиҷа",rfFlag:"Парчами Россия",rfGerb:"Нишони Россия",otherSym:"рамзи давлати дигар",copied:"нусха шуд ✅",lockHint:"🔒 Ҳар вариант баъди анҷоми қаблӣ кушода мешавад",updTitle:"Версияи нав баромад",updMsg:"Барои идома, лутфан барномаро ба версияи нав нав кунед.",updBtn:"Нав кардан",exitHint:"Барои баромадан боз як бор пахш кунед"},
     ky:{appTitle:"Патент экзамени",sub:"Экзаменге эне тилиңизде даярданыңыз",
       all:"Бардык суроолор",til:"Орус тили",tarix:"Тарых",qonunchilik:"Мыйзамдар",mistakes:"Каталарым",
       q:"Суроо",next:"Кийинки",wrong:"Ката!",right:"Туура жооп:",done:"Бүттү!",score:"Туура жооптор",
@@ -7333,7 +7338,7 @@
       listen:"🔊 Угуу",playing:"▶ Ойноп жатат…",audioOff:"Үн жүктөө үчүн интернет керек",
       audioLoad:"Үн жүктөлүүдө…",check:"Текшерүү",typeHere:"Жоопту жазыңыз…",
       updOk:"Жаңырды ✓",updNo:"Оффлайн — ички база",updChk:"Текшерилүүдө…",
-      variants:"Варианттар",byTopic:"Тема боюнча машык",variant:"Вариант",trans:"Котормо",tutNext:"Кийинки",tutDone:"Баштоо",dlAudio:"Үндөрдү жүктөп алуу",dlHint:"оффлайн үчүн",dlDone:"Оффлайн даяр ✓",dlOff:"Интернет керек",dlWait:"Жүктөлүүдө…",phoneTitle:"Телефон номериңиз",phoneHint:"Улантуу үчүн номериңизди киргизиңиз",enter:"Кирүү",phoneErr:"Номерди толук киргизиңиз",demo:"Демо экзамен",examInfo:"22 суроо · 40 мүнөт",examIntroDesc:"22 суроо, 40 мүнөт, котормосуз. Чыныгы экзамендей: жооп бергенден кийин кийинкиге өтөт, натыйжа аягында.",start:"Баштоо →",finishExam:"Аяктоо",examPass:"Өттүңүз ✅",examFail:"Өтө алган жоксуз ❌",examPassMsg:"Куттуктайбыз! Өтүү баллына жеттиңиз.",examFailMsg:"Азырынча жетпеди — машыгып, кайра аракет кылыңыз.",factNote:"2026-жылдын абалы боюнча, расмий экзамендан өтүү үчүн кеминде 19/22 (≈86%) туура жооп керек.",answeredBtn:"📋 Жооп берилген суроолор",yourAns:"Сиздин жообуңуз",correctAns:"Туура жооп",notAnswered:"— жооп берилген жок —",examResult:"Натыйжа",rfFlag:"Россия желеги",rfGerb:"Россия гербы",otherSym:"башка мамлекеттин белгиси",copied:"көчүрүлдү ✅",lockHint:"🔒 Ар бир вариант мурункусун бүткөндөн кийин ачылат",updTitle:"Жаңы версия чыкты",updMsg:"Улантуу үчүн колдонмону жаңы версияга жаңылаңыз.",updBtn:"Жаңылоо"}
+      variants:"Варианттар",byTopic:"Тема боюнча машык",variant:"Вариант",trans:"Котормо",tutNext:"Кийинки",tutDone:"Баштоо",dlAudio:"Үндөрдү жүктөп алуу",dlHint:"оффлайн үчүн",dlDone:"Оффлайн даяр ✓",dlOff:"Интернет керек",dlWait:"Жүктөлүүдө…",phoneTitle:"Телефон номериңиз",phoneHint:"Улантуу үчүн номериңизди киргизиңиз",enter:"Кирүү",phoneErr:"Номерди толук киргизиңиз",demo:"Демо экзамен",examInfo:"22 суроо · 40 мүнөт",examIntroDesc:"22 суроо, 40 мүнөт, котормосуз. Чыныгы экзамендей: жооп бергенден кийин кийинкиге өтөт, натыйжа аягында.",start:"Баштоо →",finishExam:"Аяктоо",examPass:"Өттүңүз ✅",examFail:"Өтө алган жоксуз ❌",examPassMsg:"Куттуктайбыз! Өтүү баллына жеттиңиз.",examFailMsg:"Азырынча жетпеди — машыгып, кайра аракет кылыңыз.",factNote:"2026-жылдын абалы боюнча, расмий экзамендан өтүү үчүн кеминде 19/22 (≈86%) туура жооп керек.",answeredBtn:"📋 Жооп берилген суроолор",yourAns:"Сиздин жообуңуз",correctAns:"Туура жооп",notAnswered:"— жооп берилген жок —",examResult:"Натыйжа",rfFlag:"Россия желеги",rfGerb:"Россия гербы",otherSym:"башка мамлекеттин белгиси",copied:"көчүрүлдү ✅",lockHint:"🔒 Ар бир вариант мурункусун бүткөндөн кийин ачылат",updTitle:"Жаңы версия чыкты",updMsg:"Улантуу үчүн колдонмону жаңы версияга жаңылаңыз.",updBtn:"Жаңылоо",exitHint:"Чыгуу үчүн дагы бир жолу басыңыз"}
   };
   var LANGS=[{code:"uz",name:"O'zbekcha (lotin)",flag:"🇺🇿"},{code:"uzc",name:"Ўзбекча (крил)",flag:"🇺🇿"},{code:"tg",name:"Тоҷикӣ",flag:"🇹🇯"},{code:"ky",name:"Кыргызча",flag:"🇰🇬"}];
   var TUT={
@@ -8003,6 +8008,37 @@
   checkVersion();
   if(state.view==="home"){checkUpdate();sendIdOnce();}
   window.addEventListener("online",function(){sendIdOnce();checkVersion();});
+
+  /* ====== Toast ====== */
+  var _toastT=null;
+  function showToast(msg){
+    var e=document.getElementById("pi_toast");
+    if(!e){e=document.createElement("div");e.id="pi_toast";e.className="toast";document.body.appendChild(e);}
+    e.textContent=msg;e.style.display="block";
+    clearTimeout(_toastT);_toastT=setTimeout(function(){if(e)e.style.display="none";},1800);
+  }
+
+  /* ====== Android "orqaga" tugmasi — ilova ichida qaytadi, chiqib ketmaydi ====== */
+  var _exitArmed=false,_exitT=null;
+  function seedBack(){try{history.pushState({pi:1},"");}catch(e){}}
+  seedBack();
+  window.addEventListener("popstate",function(){
+    if(blocked){seedBack();return;}                 // yangilash ekrani — qulf
+    var v=state.view;
+    if(v==="home"||v==="lang"){                      // bosh sahifa — ikki marta bossa chiqadi
+      if(_exitArmed){history.back();return;}
+      _exitArmed=true;
+      var L=T[state.lang]||T.uz;showToast(L.exitHint);
+      seedBack();clearTimeout(_exitT);_exitT=setTimeout(function(){_exitArmed=false;},2000);
+      return;
+    }
+    stopAudio();
+    if(typeof clearExamTimer==="function")clearExamTimer();
+    if(v==="quiz")state.view=backView();
+    else if(v==="examreview")state.view="examresult";
+    else state.view="home";
+    render();seedBack();
+  });
 })();
 </script>
 </body>
