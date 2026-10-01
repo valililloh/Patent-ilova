@@ -7451,8 +7451,13 @@
   var VARIANTS=[];
   function buildVariants(){
     var ordered=POOL.slice().sort(function(a,b){return hstr(qid(a))-hstr(qid(b));});
-    var out=[];for(var i=0;i<ordered.length;i+=22)out.push(ordered.slice(i,i+22));
-    if(out.length>1 && out[out.length-1].length<11){var last=out.pop();out[out.length-1]=out[out.length-1].concat(last);}
+    var units=unitize(ordered);               // ovoz juftlari birga qoladi
+    var out=[],cur=[],tasks=0;
+    for(var i=0;i<units.length;i++){
+      cur.push(units[i]);tasks+=unitSize(units[i]);
+      if(tasks>=22){out.push(cur);cur=[];tasks=0;}
+    }
+    if(cur.length){ if(out.length>1 && tasks<11) out[out.length-1]=out[out.length-1].concat(cur); else out.push(cur); }
     VARIANTS=out;return out;
   }
 
@@ -7631,7 +7636,7 @@
   function startVariant(i){
     var list=VARIANTS[i];if(!list||!list.length)return;
     state.topic="V"+(i+1);state.idx=0;state.correct=0;
-    state.list=shuffle(unitize(list));
+    state.list=shuffle(list.slice());   // allaqachon birliklar — juftlar butun
     state.requeueOn=true;state.everWrong={};state.uniqueTotal=totalTasks(state.list);
     state.view="quiz";render();
   }
@@ -7640,13 +7645,30 @@
   /* ====== Demo imtihon ====== */
   var EXAM_N=22, EXAM_SECONDS=40*60, EXAM_PASS=19;
   function examPool(){return POOL.filter(function(q){return q.tur!=="yozma";});}
-  function buildExam(){
-    var byT={til:[],tarix:[],qonunchilik:[]};
-    shuffle(examPool()).forEach(function(q){if(byT[q.mavzu])byT[q.mavzu].push(q);});
-    var want={til:10,tarix:5,qonunchilik:7},list=[];
-    ["til","tarix","qonunchilik"].forEach(function(k){list=list.concat(byT[k].slice(0,want[k]));});
-    if(list.length<EXAM_N){var rest=shuffle(examPool()).filter(function(q){return list.indexOf(q)<0;});list=list.concat(rest.slice(0,EXAM_N-list.length));}
-    return shuffle(list).slice(0,EXAM_N);
+  // Imtihon UNIT (birlik) darajasida quriladi — ovoz juftlari ajralmaydi
+  function buildExamUnits(){
+    var pool=examPool();
+    var tilUnits=shuffle(unitize(pool.filter(function(q){return q.mavzu==="til";})));  // juftlar birga
+    var tarix=shuffle(pool.filter(function(q){return q.mavzu==="tarix";}));
+    var qon=shuffle(pool.filter(function(q){return q.mavzu==="qonunchilik";}));
+    var units=[],tilTasks=0,singles=[];
+    // til: 10 ta vazifaga yetguncha (juft=2, bitta=1)
+    for(var i=0;i<tilUnits.length && tilTasks<10;i++){
+      var u=tilUnits[i],sz=unitSize(u);
+      if(tilTasks+sz<=10){units.push(u);tilTasks+=sz;}
+      else if(sz===1){units.push(u);tilTasks+=1;}
+      else singles.push(u); // juft sig'madi — keyin bittalar bilan to'ldiramiz
+    }
+    // agar toq qolgan bo'lsa, til bitta savollari bilan 10 ga to'ldiramiz
+    if(tilTasks<10){
+      var tilSingles=shuffle(pool.filter(function(q){return q.mavzu==="til" && q.tur!=="ovoz";}));
+      for(var j=0;j<tilSingles.length && tilTasks<10;j++){
+        if(units.indexOf(tilSingles[j])<0){units.push(tilSingles[j]);tilTasks++;}
+      }
+    }
+    tarix.slice(0,5).forEach(function(q){units.push(q);});
+    qon.slice(0,7).forEach(function(q){units.push(q);});
+    return shuffle(units);
   }
   function renderExamIntro(){
     var L=t();
@@ -7662,7 +7684,7 @@
   function clearExamTimer(){if(state.examTimerId){clearInterval(state.examTimerId);state.examTimerId=null;}}
   function fmtTime(s){s=Math.max(0,s);var m=Math.floor(s/60),ss=s%60;return m+":"+(ss<10?"0":"")+ss;}
   function startExam(){
-    state.examList=shuffle(unitize(buildExam()));state.examIdx=0;state.examAns={};
+    state.examList=buildExamUnits();state.examIdx=0;state.examAns={};
     state.examEndsAt=Date.now()+EXAM_SECONDS*1000;
     clearExamTimer();state.examTimerId=setInterval(tickTimer,1000);
     state.view="exam";render();
@@ -7859,29 +7881,39 @@
     app.innerHTML=body;
     var bk=document.getElementById("back");if(bk)bk.onclick=function(){stopAudio();state.view=backView();render();};
     setupPlay({ovoz_guruh:unit.ovoz_guruh});
-    var answered=[false,false];
+    var answered=[false,false],chosen=[null,null];
+    // Mashq rejimi: ikkala savol javob berilgach natijani ko'rsatamiz
+    function reveal(){
+      unit.pair.forEach(function(q,bi){
+        var oi=chosen[bi];
+        var selBtn=app.querySelector('.opt[data-b="'+bi+'"][data-o="'+oi+'"]');
+        if(selBtn)selBtn.classList.remove("sel");
+        if(oi===q.togri){if(selBtn)selBtn.classList.add("ok");state.correct++;removeMistake(qid(q));}
+        else{
+          if(selBtn)selBtn.classList.add("bad");
+          var okb=app.querySelector('.opt[data-b="'+bi+'"][data-o="'+q.togri+'"]');if(okb)okb.classList.add("ok");
+          addMistake(qid(q));markWrong(q);requeue(q);
+          document.getElementById("after"+bi).innerHTML='<div class="explain"><div class="exhead">✕ '+esc(L.wrong)+'</div>'+
+            '<div class="exok">'+esc(L.right)+' <b>'+esc(q.javoblar[q.togri])+'</b></div>'+
+            (iz(q)?'<div class="extext">💡 '+esc(iz(q))+'</div>':'')+'</div>';
+        }
+      });
+      document.getElementById("pairnext").innerHTML='<button class="primary" id="nextbtn">'+esc(L.next)+' →</button>';
+      document.getElementById("nextbtn").onclick=next;
+    }
     function checkDone(){
       if(!(answered[0]&&answered[1]))return;
-      if(isExam){setTimeout(examNext,700);}
-      else{document.getElementById("pairnext").innerHTML='<button class="primary" id="nextbtn">'+esc(L.next)+' →</button>';
-        document.getElementById("nextbtn").onclick=next;}
+      if(isExam){stopAudio();setTimeout(examNext,700);}
+      else{reveal();}
     }
     unit.pair.forEach(function(q,bi){
       app.querySelectorAll('.opt[data-b="'+bi+'"]').forEach(function(btn){
         btn.onclick=function(){
-          if(answered[bi])return;answered[bi]=true;stopAudio();
-          var oi=+btn.getAttribute("data-o");
+          if(answered[bi])return;answered[bi]=true;
+          var oi=+btn.getAttribute("data-o");chosen[bi]=oi;
           app.querySelectorAll('.opt[data-b="'+bi+'"]').forEach(function(b){b.disabled=true;});
-          if(isExam){state.examAns[qid(q)]=oi;btn.classList.add("sel");}
-          else{
-            if(oi===q.togri){btn.classList.add("ok");state.correct++;removeMistake(qid(q));}
-            else{btn.classList.add("bad");
-              var okb=app.querySelector('.opt[data-b="'+bi+'"][data-o="'+q.togri+'"]');if(okb)okb.classList.add("ok");
-              addMistake(qid(q));markWrong(q);requeue(q);
-              document.getElementById("after"+bi).innerHTML='<div class="explain"><div class="exhead">✕ '+esc(L.wrong)+'</div>'+
-                '<div class="exok">'+esc(L.right)+' <b>'+esc(q.javoblar[q.togri])+'</b></div>'+
-                (iz(q)?'<div class="extext">💡 '+esc(iz(q))+'</div>':'')+'</div>';}
-          }
+          btn.classList.add("sel"); // neytral belgi — to'g'ri/xato hali ko'rsatilmaydi
+          if(isExam)state.examAns[qid(q)]=oi;
           checkDone();
         };
       });
