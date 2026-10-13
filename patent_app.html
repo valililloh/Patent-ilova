@@ -7263,7 +7263,7 @@
   var WEBHOOK_URL="https://patent-server-production.up.railway.app";  // Railway server — anonim id yuboriladi
   // Ilova kodi versiyasi. Yangi versiya chiqarganda buni +1 qiling (APK versionCode ham +1).
   // Admin panelда "min" shu raqamdan katta qilinsa — eski ilovalar bloklanadi.
-  var APP_VERSION=1;
+  var APP_VERSION=2;
 
   // Qisqa, anonim ID — foydalanuvchini sanash uchun (telefon raqam O'RNIGA)
   function shortId(){
@@ -7286,6 +7286,69 @@
         body:JSON.stringify({uid:id,id:id,raqam:id,mamlakat:countryOf(state.lang),til:state.lang,vaqt:new Date().toISOString()})})
         .then(function(r){if(r&&r.ok)set("pi_id_sent",true);}).catch(function(){});
     }catch(e){}
+  }
+
+  /* ====== Foydalanish vaqti ======
+     Ilova ochiq (ekranda) turgan vaqt telefonda kunma-kun yig'iladi: pi_usage = {"YYYY-MM-DD": soniya}.
+     Oflayn bo'lsa ham yig'ilaveradi; internet bo'lganda serverga yuboriladi (eski kunlar ham).
+     Har kun uchun JAMI soniya yuboriladi — server eng kattasini oladi, qayta yuborish xavfsiz. */
+  function dayKey(t){var d=new Date(t);return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+  var _useLast=0,_useCarry=0;
+  function useTick(){
+    var now=Date.now();
+    if(_useLast&&!document.hidden){
+      var dt=now-_useLast;
+      // 90 soniyadan katta bo'shliq — telefon uxlagan/ilova to'xtagan, hisoblamaymiz
+      if(dt>0&&dt<=90000){
+        _useCarry+=dt;
+        var sec=Math.floor(_useCarry/1000);
+        if(sec>0){
+          _useCarry-=sec*1000;
+          var u=get("pi_usage",{})||{},k=dayKey(now);
+          u[k]=(u[k]||0)+sec;set("pi_usage",u);
+        }
+      }
+    }
+    _useLast=document.hidden?0:now;
+  }
+  var _usageSyncing=false;
+  function syncUsage(onExit){
+    if(!WEBHOOK_URL||!navigator.onLine||_usageSyncing)return;
+    var u=get("pi_usage",{})||{},sent=get("pi_usage_sent",{})||{};
+    var old=dayKey(Date.now()-60*86400000),days={},n=0,ch=false;
+    Object.keys(u).forEach(function(k){
+      if(k<old){delete u[k];delete sent[k];ch=true;return;} // server 60 kundan eskisini qabul qilmaydi
+      if(u[k]!==sent[k]){days[k]=u[k];n++;}
+    });
+    if(ch){set("pi_usage",u);set("pi_usage_sent",sent);}
+    if(!n)return;
+    _usageSyncing=true;
+    try{
+      fetch(WEBHOOK_URL+"/usage",{method:"POST",keepalive:!!onExit,
+        body:JSON.stringify({uid:shortId(),days:days})})
+        .then(function(r){
+          _usageSyncing=false;
+          if(!r||!r.ok)return;
+          var today=dayKey(Date.now()),cur=get("pi_usage",{})||{},s2=get("pi_usage_sent",{})||{};
+          Object.keys(days).forEach(function(k){
+            // o'tgan kun to'liq yuborildi — telefondan o'chiramiz; bugungisi davom etadi
+            if(k<today&&cur[k]===days[k]){delete cur[k];delete s2[k];}
+            else s2[k]=days[k];
+          });
+          set("pi_usage",cur);set("pi_usage_sent",s2);
+        }).catch(function(){_usageSyncing=false;});
+    }catch(e){_usageSyncing=false;}
+  }
+  function startUsage(){
+    _useLast=document.hidden?0:Date.now();
+    setInterval(useTick,15000);
+    setInterval(function(){syncUsage(false);},5*60000);
+    document.addEventListener("visibilitychange",function(){
+      useTick();
+      if(document.hidden)syncUsage(true);
+    });
+    window.addEventListener("pagehide",function(){useTick();syncUsage(true);});
+    setTimeout(function(){syncUsage(false);},3000);
   }
   // ====== Lotin -> Kirill (O'zbekcha transliteratsiya) ======
   function toCyr(s){
@@ -8040,7 +8103,8 @@
   render();
   checkVersion();
   if(state.view==="home"){checkUpdate();sendIdOnce();}
-  window.addEventListener("online",function(){sendIdOnce();checkVersion();});
+  window.addEventListener("online",function(){sendIdOnce();checkVersion();syncUsage(false);});
+  startUsage();
 
   /* ====== Toast ====== */
   var _toastT=null;
